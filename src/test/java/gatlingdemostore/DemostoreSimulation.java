@@ -64,7 +64,18 @@ public class DemostoreSimulation extends Simulation {
           .exec(
             http("Add Product to Cart")
               .get("/cart/add/#{id}")
-              .check(substring("items in your cart")));
+              .check(substring("items in your cart")))
+          .exec(
+            session -> {
+              double currentCartTotal = session.getDouble("cartTotal");
+              double itemPrice = session.getDouble("price");
+              return session.set("cartTotal", (currentCartTotal + itemPrice));
+            })
+          .exec(
+            session -> {
+              System.out.println("cartTotal:" + session.get("cartTotal").toString());
+              return session;
+            });
     }
   }
 
@@ -74,18 +85,34 @@ public class DemostoreSimulation extends Simulation {
         .exec(http("Load Login Page")
           .get("/login")
           .check(substring("#Username:")))
+          .exec(
+            session -> {
+              System.out.println("customerLoggedIn:" + session.get("customerLoggedIn").toString());
+              return session;
+            }
+          )
         .exec(
           http("Customer Login Action")
             .post("/login")
             .formParam("_csrf", "#{csrfValue}")
             .formParam("username", "#{username}")
-            .formParam("password", "#{password}"));
+            .formParam("password", "#{password}"))
+        .exec(session -> session.set("customerLoggedIn", true))
+        .exec(
+          session -> {
+            System.out.println("customerLoggedIn:" + session.get("customerLoggedIn").toString());
+            return session;
+          }
+        );
   }
 
   private static class Checkout {
     private static final ChainBuilder viewCart = 
-      exec(http("Load Cart Page")
-        .get("/cart/view"));
+      doIf(session -> !session.getBoolean("customerLoggedIn"))
+        .then(exec(Customer.login))
+      .exec(http("Load Cart Page")
+        .get("/cart/view")
+        .check(css("#grandTotal").isEL("$#{cartTotal}")));
     
     private static final ChainBuilder completeCheckout =
       exec(http("Checkout Cart Page")
@@ -105,8 +132,6 @@ public class DemostoreSimulation extends Simulation {
           .exec(Catalog.Product.add)
           .pause(2)
           .exec(Checkout.viewCart)
-          .pause(2)
-          .exec(Customer.login)
           .pause(2)
           .exec(Checkout.completeCheckout);
 
