@@ -79,7 +79,7 @@ public class DemostoreSimulation extends Simulation {
       feed(csvFeederLoginDetails)
         .exec(http("Load Login Page")
           .get("/login")
-          .check(substring("#Username:")))
+          .check(substring("Username:")))
         .exec(
           http("Customer Login Action")
             .post("/login")
