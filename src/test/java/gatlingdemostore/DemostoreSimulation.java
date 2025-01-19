@@ -59,7 +59,7 @@ public class DemostoreSimulation extends Simulation {
 
   private static class Checkout {
     private static final ChainBuilder viewCart = 
-      exec(http("Load Catr Page")
+      exec(http("Load Cart Page")
         .get("/cart/view"));
   }
 
