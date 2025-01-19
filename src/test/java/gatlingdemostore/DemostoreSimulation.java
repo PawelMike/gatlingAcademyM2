@@ -165,6 +165,28 @@ public class DemostoreSimulation extends Simulation {
         .exec(Checkout.completeCheckout);
   }
 
+  private static class Scenarios {
+    private static final ScenarioBuilder defaultPurchase =
+      scenario("Default Load Test")
+        .during(Duration.ofSeconds(60))
+        .on(
+          randomSwitch()
+            .on(
+              Choice.withWeight(75.0, exec(UserJourneys.browseStore)),
+              Choice.withWeight(15.0, exec(UserJourneys.abadonedCart)),
+              Choice.withWeight(10.0, exec(UserJourneys.completePurchase))));
+    
+    private static final ScenarioBuilder highPurchase =
+      scenario("High Purchase Load Test")
+        .during(Duration.ofSeconds(60))
+          .on(
+            randomSwitch()
+              .on(
+                Choice.withWeight(25.0, exec(UserJourneys.browseStore)),
+                Choice.withWeight(25.0, exec(UserJourneys.abadonedCart)),
+                Choice.withWeight(50.0, exec(UserJourneys.completePurchase))));
+  }
+
   {
     setUp(
       scn.injectOpen(constantUsersPerSec(1).during(Duration.ofMinutes(3)))
