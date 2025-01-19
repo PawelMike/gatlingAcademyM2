@@ -12,10 +12,13 @@ public class DemostoreSimulation extends Simulation {
   private static final HttpProtocolBuilder HTTP_PROTOCOL = http.baseUrl("https://" + DOMAIN);
 
   private static final FeederBuilder<String> categoryFeeder =
-      csv("data/categoryDetails.csv").random();
+    csv("data/categoryDetails.csv").random();
 
   private static final FeederBuilder<Object> jsonFeederProducts =
-      jsonFile("data/productDetails.json").random();
+    jsonFile("data/productDetails.json").random();
+
+  private static final FeederBuilder<String> csvFeederLoginDetails =
+    csv("data/loginDetails.csv").circular();
 
   private static class CmsPages {
 
@@ -57,6 +60,20 @@ public class DemostoreSimulation extends Simulation {
     }
   }
 
+  private static class Customer {
+    private static final ChainBuilder login =
+      feed(csvFeederLoginDetails)
+        .exec(http("Load Login Page")
+          .get("/login")
+          .check(substring("#Username:")))
+        .exec(
+          http("Customer Login Action")
+            .post("/login")
+            .formParam("_csrf", "#{csrfValue}")
+            .formParam("username", "#{username}")
+            .formParam("password", "#{password}"));
+  }
+
   private static class Checkout {
     private static final ChainBuilder viewCart = 
       exec(http("Load Cart Page")
@@ -75,12 +92,7 @@ public class DemostoreSimulation extends Simulation {
           .pause(2)
           .exec(Checkout.viewCart)
           .pause(2)
-          .exec(
-              http("Login User")
-                  .post("/login")
-                  .formParam("_csrf", "#{csrfValue}")
-                  .formParam("username", "user1")
-                  .formParam("password", "pass"))
+          .exec(Customer.login)
           .pause(2)
           .exec(http("Checkout").get("/cart/checkout"));
 
