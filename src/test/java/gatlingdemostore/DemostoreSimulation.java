@@ -5,6 +5,7 @@ import static io.gatling.javaapi.http.HttpDsl.*;
 
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class DemostoreSimulation extends Simulation {
 
@@ -19,6 +20,13 @@ public class DemostoreSimulation extends Simulation {
 
   private static final FeederBuilder<String> csvFeederLoginDetails =
     csv("data/loginDetails.csv").circular();
+
+  private static final ChainBuilder initSession =
+    exec(flushCookieJar())
+      .exec(session -> session.set("randomNumber", ThreadLocalRandom.current().nextInt()))
+      .exec(session -> session.set("customerLoggedIn", false))
+      .exec(session -> session.set("cartTotal", 0.00))
+      .exec(addCookie(Cookie("sessionId", SessionId.random()).withDomain(DOMAIN)));
 
   private static class CmsPages {
 
@@ -87,6 +95,7 @@ public class DemostoreSimulation extends Simulation {
 
   private static final ScenarioBuilder scn =
       scenario("DemostoreSimulation")
+          .exec(initSession)
           .exec(CmsPages.homepage)
           .pause(2)
           .exec(CmsPages.aboutUs)
