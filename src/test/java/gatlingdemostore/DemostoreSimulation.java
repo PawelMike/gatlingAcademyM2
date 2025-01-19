@@ -175,21 +175,21 @@ public class DemostoreSimulation extends Simulation {
             .during(TEST_DURATION)
             .on(
                 randomSwitch()
-                    .on(percent(75.0), exec(UserJourneys.browseStore))  // 75% dla browseStore
-                    .on(percent(15.0), exec(UserJourneys.abandonedCart)) // 15% dla abandonedCart
-                    .on(percent(10.0), exec(UserJourneys.completePurchase)) // 10% dla completePurchase
-            );
+                    .on(
+                      percent(75.0, exec(UserJourneys.browseStore)),
+                      percent(15.0, exec(UserJourneys.abandonCart)),
+                      percentt(10.0, exec(UserJourneys.completePurchase))));
 
     private static final ScenarioBuilder highPurchase =
         scenario("High Purchase Load Test")
-            .during(TEST_DURATION)
+            .during(Duration.ofSeconds(60))
             .on(
                 randomSwitch()
-                    .on(percent(25.0), exec(UserJourneys.browseStore))  // 25% dla browseStore
-                    .on(percent(25.0), exec(UserJourneys.abandonedCart)) // 25% dla abandonedCart
-                    .on(percent(50.0), exec(UserJourneys.completePurchase)) // 50% dla completePurchase
-            );
-}
+                    .on(
+                      percent(25.0, exec(UserJourneys.browseStore)),
+                      percent(25.0, exec(UserJourneys.abandonCart)),
+                      percent(50.0, exec(UserJourneys.completePurchase))));
+  }
 
   {
     setUp(
