@@ -57,6 +57,12 @@ public class DemostoreSimulation extends Simulation {
     }
   }
 
+  private static class Checkout {
+    private static final ChainBuilder viewCart = 
+      exec(http("Load Catr Page")
+        .get("/cart/view"));
+  }
+
   private static final ScenarioBuilder scn =
       scenario("DemostoreSimulation")
           .exec(CmsPages.homepage)
@@ -67,7 +73,7 @@ public class DemostoreSimulation extends Simulation {
           .pause(2)
           .exec(Catalog.Product.add)
           .pause(2)
-          .exec(http("View Cart").get("/cart/view"))
+          .exec(Checkout.viewCart)
           .pause(2)
           .exec(
               http("Login User")
