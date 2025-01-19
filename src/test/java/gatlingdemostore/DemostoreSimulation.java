@@ -78,6 +78,11 @@ public class DemostoreSimulation extends Simulation {
     private static final ChainBuilder viewCart = 
       exec(http("Load Cart Page")
         .get("/cart/view"));
+    
+    private static final ChainBuilder completeCheckout =
+      exec(http("Checkout Cart Page")
+        .get("/cart/checkout")
+        .check(substring("Thanks for your order! See you soon!")));
   }
 
   private static final ScenarioBuilder scn =
@@ -94,7 +99,7 @@ public class DemostoreSimulation extends Simulation {
           .pause(2)
           .exec(Customer.login)
           .pause(2)
-          .exec(http("Checkout").get("/cart/checkout"));
+          .exec(Checkout.completeCheckout);
 
   {
     setUp(scn.injectOpen(atOnceUsers(1))).protocols(HTTP_PROTOCOL);
