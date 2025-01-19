@@ -1,12 +1,10 @@
 package gatlingdemostore;
 
 import static io.gatling.javaapi.core.CoreDsl.*;
-import static io.gatling.javaapi.http.HttpDsl.http;
+import static io.gatling.javaapi.http.HttpDsl.*;
 
-import io.gatling.javaapi.core.ChainBuilder;
-import io.gatling.javaapi.core.ScenarioBuilder;
-import io.gatling.javaapi.core.Simulation;
-import io.gatling.javaapi.http.HttpProtocolBuilder;
+import io.gatling.javaapi.core.*;
+import io.gatling.javaapi.http.*;
 
 public class DemostoreSimulation extends Simulation {
 
@@ -16,7 +14,7 @@ public class DemostoreSimulation extends Simulation {
   private static final FeederBuilder<String> categoryFeeder =
       csv("data/categoryDetails.csv").random();
 
-  private static final FeederBuilder<Object> jsonFeederProducts = 
+  private static final FeederBuilder<Object> jsonFeederProducts =
       jsonFile("data/productDetails.json").random();
 
   private static class CmsPages {
@@ -34,20 +32,21 @@ public class DemostoreSimulation extends Simulation {
 
   private static class Catalog {
     private static class Category {
-        private static final ChainBuilder view = feed(categoryFeeder)
-            .exec(
-                http("Load Category Page - #{categoryName}")
-                    .get("/category/#{categorySlug}")
-                    .check(css("#categoryName").isEL("#{CategoryName}")));
+      private static final ChainBuilder view =
+          feed(categoryFeeder)
+              .exec(
+                  http("Load Category Page - #{categoryName}")
+                      .get("/category/#{categorySlug}")
+                      .check(css("#CategoryName").isEL("#{categoryName}")));
     }
 
     private static class Product {
       private static final ChainBuilder view =
-        feed(jsonFeederProducts)
-          .exec(
-            http("Load Product Page - #{name}")
-              .get("/product/#{slug}")
-              .check(css("#ProductDescription").isEL("#{#description}")));
+          feed(jsonFeederProducts)
+              .exec(
+                  http("Load Product Page - #{name}")
+                      .get("/product/#{slug}")
+                      .check(css("#ProductDescription").isEL("#{description}")));
     }
   }
 
