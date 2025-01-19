@@ -70,11 +70,6 @@ public class DemostoreSimulation extends Simulation {
               double currentCartTotal = session.getDouble("cartTotal");
               double itemPrice = session.getDouble("price");
               return session.set("cartTotal", (currentCartTotal + itemPrice));
-            })
-          .exec(
-            session -> {
-              System.out.println("cartTotal:" + session.get("cartTotal").toString());
-              return session;
             });
     }
   }
@@ -85,25 +80,13 @@ public class DemostoreSimulation extends Simulation {
         .exec(http("Load Login Page")
           .get("/login")
           .check(substring("#Username:")))
-          .exec(
-            session -> {
-              System.out.println("customerLoggedIn:" + session.get("customerLoggedIn").toString());
-              return session;
-            }
-          )
         .exec(
           http("Customer Login Action")
             .post("/login")
             .formParam("_csrf", "#{csrfValue}")
             .formParam("username", "#{username}")
             .formParam("password", "#{password}"))
-        .exec(session -> session.set("customerLoggedIn", true))
-        .exec(
-          session -> {
-            System.out.println("customerLoggedIn:" + session.get("customerLoggedIn").toString());
-            return session;
-          }
-        );
+        .exec(session -> session.set("customerLoggedIn", true));
   }
 
   private static class Checkout {
