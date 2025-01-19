@@ -47,6 +47,13 @@ public class DemostoreSimulation extends Simulation {
                   http("Load Product Page - #{name}")
                       .get("/product/#{slug}")
                       .check(css("#ProductDescription").isEL("#{description}")));
+
+      private static final ChainBuilder add =
+        exec(view)
+          .exec(
+            http("Add Product to Cart")
+              .get("/cart/add/#{id}")
+              .check(substring("items in your cart")));
     }
   }
 
@@ -58,9 +65,7 @@ public class DemostoreSimulation extends Simulation {
           .pause(2)
           .exec(Catalog.Category.view)
           .pause(2)
-          .exec(Catalog.Product.view)
-          .pause(2)
-          .exec(http("Add Product to Cart").get("/cart/add/19"))
+          .exec(Catalog.Product.add)
           .pause(2)
           .exec(http("View Cart").get("/cart/view"))
           .pause(2)
