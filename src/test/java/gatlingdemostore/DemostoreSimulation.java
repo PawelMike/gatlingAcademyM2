@@ -2,9 +2,13 @@ package gatlingdemostore;
 
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.*;
+import static io.gatling.javaapi.jdbc.JdbcDsl.*;
+
 
 import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
+import io.gatling.javaapi.jdbc.*;
+import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DemostoreSimulation extends Simulation {
@@ -118,16 +122,58 @@ public class DemostoreSimulation extends Simulation {
           .pause(2)
           .exec(Checkout.completeCheckout);
 
+  private static class UserJourneys {
+
+    private static final Duration MIN_PAUSE = Duration.ofMillis(100);
+    private static final Duration MAX_PAUSE = Duration.ofMillis(500);
+
+    private static final ChainBuilder browseStore = 
+      exec(initSession)
+        .exec(CmsPages.homepage)
+        .pause(MAX_PAUSE)
+        .exec(CmsPages.aboutUs)
+        .pause(MIN_PAUSE, MAX_PAUSE)
+        .repeat(5)
+          .on(
+            exec(Catalog.Category.view)
+              .pause(MIN_PAUSE, MAX_PAUSE)
+              .exec(Catalog.Product.view)
+          );
+
+    private static final ChainBuilder abadonedCart = 
+      exec(initSession)
+        .exec(CmsPages.homepage)
+        .pause(MAX_PAUSE)
+        .exec(Catalog.Category.view)
+        .pause(MIN_PAUSE, MAX_PAUSE)
+        .exec(Catalog.Product.view)
+        .pause(MIN_PAUSE, MAX_PAUSE)
+        .exec(Catalog.Product.add);
+
+    private static final ChainBuilder completePurchase =
+      exec(initSession)
+        .exec(CmsPages.homepage)
+        .pause(MAX_PAUSE)
+        .exec(Catalog.Category.view)
+        .pause(MIN_PAUSE, MAX_PAUSE)
+        .exec(Catalog.Product.view)
+        .pause(MIN_PAUSE, MAX_PAUSE)
+        .exec(Catalog.Product.add)
+        .pause(MIN_PAUSE, MAX_PAUSE)
+        .exec(Checkout.viewCart)
+        .pause(MIN_PAUSE, MAX_PAUSE)
+        .exec(Checkout.completeCheckout);
+  }
 
   {
     setUp(
-      scn.injectOpen(constantUsersPerSec(1).during(1600))
+      scn.injectOpen(constantUsersPerSec(1).during(Duration.ofMinutes(3)))
         .protocols(HTTP_PROTOCOL)
         .throttle(
-          reachRps(10).in(30),
-          holdFor(60),
+          reachRps(10).in(Duration.ofSeconds(30)),
+          holdFor(Duration.ofSeconds(60)),
           jumpToRps(20),
-          holdFor(60)))
+          holdFor(Duration.ofSeconds(60))))
       .maxDuration(1600);
   }        
   // {
