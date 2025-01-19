@@ -118,14 +118,26 @@ public class DemostoreSimulation extends Simulation {
           .pause(2)
           .exec(Checkout.completeCheckout);
 
+
   {
-  setUp(
-    scn.injectOpen(
-        atOnceUsers(3),
-        nothingFor(5),
-        rampUsers(10).during(20),
-        nothingFor(10),
-        constantUsersPerSec(1).during(20)))
-      .protocols(HTTP_PROTOCOL);
-  }
+    setUp(
+      scn.injectOpen(constantUsersPerSec(1).during(1600))
+        .protocols(HTTP_PROTOCOL)
+        .throttle(
+          reachRps(10).in(30),
+          holdFor(60),
+          jumpToRps(20),
+          holdFor(60)))
+      .maxDuration(1600);
+  }        
+  // {
+  // setUp(
+  //   scn.injectOpen(
+  //       atOnceUsers(3),
+  //       nothingFor(5),
+  //       rampUsers(10).during(20),
+  //       nothingFor(10),
+  //       constantUsersPerSec(1).during(20)))
+  //     .protocols(HTTP_PROTOCOL);
+  // }
 }
