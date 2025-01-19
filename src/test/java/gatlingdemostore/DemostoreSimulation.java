@@ -119,6 +119,13 @@ public class DemostoreSimulation extends Simulation {
           .exec(Checkout.completeCheckout);
 
   {
-    setUp(scn.injectOpen(atOnceUsers(1))).protocols(HTTP_PROTOCOL);
+  setUp(
+    scn.injectOpen(
+        atOnceUsers(3),
+        nothingFor(5),
+        rampUsers(10).during(20),
+        nothingFor(10),
+        constantUsersPerSec(1).during(20)))
+      .protocols(HTTP_PROTOCOL);
   }
 }
