@@ -176,9 +176,9 @@ public class DemostoreSimulation extends Simulation {
             .on(
                 randomSwitch()
                     .on(
-                      percent(75.0, exec(UserJourneys.browseStore)),
-                      percent(15.0, exec(UserJourneys.abandonCart)),
-                      percentt(10.0, exec(UserJourneys.completePurchase))));
+                      Choice.withWeight(75.0, exec(UserJourneys.browseStore)),
+                      Choice.withWeight(15.0, exec(UserJourneys.abandonedCart)),
+                      Choice.withWeight(10.0, exec(UserJourneys.completePurchase))));
 
     private static final ScenarioBuilder highPurchase =
         scenario("High Purchase Load Test")
@@ -186,9 +186,9 @@ public class DemostoreSimulation extends Simulation {
             .on(
                 randomSwitch()
                     .on(
-                      percent(25.0, exec(UserJourneys.browseStore)),
-                      percent(25.0, exec(UserJourneys.abandonCart)),
-                      percent(50.0, exec(UserJourneys.completePurchase))));
+                      Choice.withWeight(25.0, exec(UserJourneys.browseStore)),
+                      Choice.withWeight(25.0, exec(UserJourneys.abandonedCart)),
+                      Choice.withWeight(50.0, exec(UserJourneys.completePurchase))));
   }
 
   {
