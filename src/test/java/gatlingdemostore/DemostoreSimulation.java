@@ -194,7 +194,11 @@ public class DemostoreSimulation extends Simulation {
     {
         setUp(
             Scenarios.defaultPurchase
-                .injectOpen(rampUsers(USER_COUNT).during(RAMP_DURATION))
-                .protocols(HTTP_PROTOCOL));
+                .injectOpen(rampUsers(USER_COUNT).during(RAMP_DURATION)).protocols(HTTP_PROTOCOL)
+                .andThen(
+                    Scenarios.highPurchase
+                        .injectOpen(rampUsers(5).during(Duration.ofSeconds(10))).protocols(HTTP_PROTOCOL)
+                )   
+        );
     }        
 }
