@@ -13,7 +13,7 @@ public class DemostoreSimulation extends Simulation {
     private static final String DOMAIN = "demostore.gatling.io";
     private static final HttpProtocolBuilder HTTP_PROTOCOL = http.baseUrl("https://" + DOMAIN);
 
-    private static final int USER_COUNT = Integer.parseInt(System.getProperty("USERS", "5"));
+    private static final int USER_COUNT = Integer.parseInt(System.getProperty("USERS", "3"));
 
     private static final Duration RAMP_DURATION =
         Duration.ofSeconds(Integer.parseInt(System.getProperty("RAMP DURATION", "10")));
@@ -193,12 +193,8 @@ public class DemostoreSimulation extends Simulation {
 
     {
         setUp(
-            Scenarios.defaultPurchase
-                .injectOpen(rampUsers(USER_COUNT).during(RAMP_DURATION)).protocols(HTTP_PROTOCOL)
-                .andThen(
-                    Scenarios.highPurchase
-                        .injectOpen(rampUsers(5).during(Duration.ofSeconds(10))).protocols(HTTP_PROTOCOL)
-                )   
-        );
+            Scenarios.defaultPurchase.injectOpen(rampUsers(USER_COUNT).during(RAMP_DURATION)),
+            Scenarios.highPurchase.injectOpen(rampUsers(2).during(Duration.ofSeconds(10))))
+            .protocols(HTTP_PROTOCOL);
     }        
 }
